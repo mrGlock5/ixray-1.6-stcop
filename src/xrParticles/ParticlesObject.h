@@ -46,6 +46,8 @@ public:
 	void				SetAutoRemove		(bool auto_remove);
 
 	const shared_str	Name				();
+
+	PAPI::ParticleAction* FindAction		(shared_str PEName, PAPI::PActionEnum type);
 };
 
 
