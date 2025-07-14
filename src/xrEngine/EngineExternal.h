@@ -94,6 +94,7 @@ public:
 	u32 GetFontAltasSize() const;
 	float GetSprintFovFactor() const;
 	const char* GetCurrentPlatformFullName();
+	EEngineExternalPlatform GetPlatformType() const { return m_platform_type; };
 
 	bool operator[](const EEngineExternalUI& ID) const;
 	bool operator[](const EEngineExternalPhysical& ID) const;
