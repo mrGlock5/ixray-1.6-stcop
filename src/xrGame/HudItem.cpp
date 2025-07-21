@@ -511,9 +511,6 @@ void CHudItem::on_a_hud_attach()
 
 bool CHudItem::HudAnimationExist(const shared_str& anim_name)
 {
-	if (Level().CurrentControlEntity() != object().H_Parent())
-		return false;
-
 	auto HID = HudItemData();
 	if (HID)
 	{
@@ -521,7 +518,7 @@ bool CHudItem::HudAnimationExist(const shared_str& anim_name)
 	}
 	else
 	{
-		return g_player_hud->motion_length(anim_name, HudSection(), m_current_motion_def) > 100;
+		return g_player_hud->motion_length(anim_name, HudSection(), m_current_motion_def) != -1;
 	}
 }
 
