@@ -21,6 +21,9 @@ CUIPdaContactsWnd::CUIPdaContactsWnd()
 {
 	m_flags.zero();
 	m_hint_wnd = nullptr;
+	UIRightFrame = nullptr;
+	UIRightFrameHeader = nullptr;
+	UIDetailsWnd = nullptr;
 }
 
 CUIPdaContactsWnd::~CUIPdaContactsWnd()
@@ -32,7 +35,8 @@ void CUIPdaContactsWnd::Show(bool status)
 	inherited::Show(status);
 	if (status)
 	{
-		UIDetailsWnd->Clear();
+		if (UIDetailsWnd)
+			UIDetailsWnd->Clear();
 		Reload();
 	}
 
@@ -58,9 +62,9 @@ void CUIPdaContactsWnd::Init()
 
 	UIContactsHeader					= UIHelper::CreateFrameLine(uiXml, "left_frame_line", UIFrameContacts);
 
-	UIRightFrame						= UIHelper::CreateFrameWindow(uiXml, "right_frame_window", frameParent);
+	UIRightFrame						= UIHelper::CreateFrameWindow(uiXml, "right_frame_window", frameParent, false);
 
-	UIRightFrameHeader					= UIHelper::CreateFrameLine(uiXml, "right_frame_line", UIRightFrame);
+	UIRightFrameHeader					= UIHelper::CreateFrameLine(uiXml, "right_frame_line", UIRightFrame, false);
 
 	UIAnimation							= new CUIAnimatedStatic();UIAnimation->SetAutoDelete(true);
 	UIContactsHeader->AttachChild		(UIAnimation);
@@ -70,9 +74,7 @@ void CUIPdaContactsWnd::Init()
 	UIFrameContacts->AttachChild		(UIListWnd);
 	xml_init.InitScrollView				(uiXml, "list", 0, UIListWnd);
 
-	UIDetailsWnd						= new CUIScrollView();UIDetailsWnd->SetAutoDelete(true);
-	UIRightFrame->AttachChild			(UIDetailsWnd);
-	xml_init.InitScrollView				(uiXml, "detail_list", 0, UIDetailsWnd);
+	UIDetailsWnd						= UIHelper::CreateScrollView(uiXml, "detail_list", UIFrameContacts, false);
 
 	if (uiXml.NavigateToNode("hint_wnd"))
 	{
@@ -156,7 +158,8 @@ void CUIPdaContactsWnd::AddContact(CInventoryOwner* owner)
 void CUIPdaContactsWnd::RemoveAll()
 {
 	UIListWnd->Clear		();
-	UIDetailsWnd->Clear		();
+	if (UIDetailsWnd)
+		UIDetailsWnd->Clear		();
 }
 
 void CUIPdaContactsWnd::Reload()
@@ -181,7 +184,12 @@ extern CSE_ALifeTraderAbstract* ch_info_get_from_id (u16 id);
 void CUIPdaContactItem::SetSelected	(bool b)
 {
 	CUISelectable::SetSelected(b);
-	if(b){
+
+	if (!m_cw->UIDetailsWnd)
+		return;
+
+	if(b)
+	{
 		m_cw->UIDetailsWnd->Clear		();
 		CCharacterInfo				chInfo;
 		CSE_ALifeTraderAbstract*	T = ch_info_get_from_id(UIInfo->OwnerID());
