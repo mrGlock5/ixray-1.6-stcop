@@ -209,21 +209,31 @@ void CImGuiManager::Render()
 
 void CImGuiManager::UpdateCapture()
 {
-	const auto state = SDL_GetKeyboardState(NULL);
-	if (ImGui::IsKeyPressed(ImGuiKey_A) && ImGui::IsKeyDown(ImGuiKey_LeftAlt))
-	{
-		if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
-		{
-			DrawUIRender = !DrawUIRender;
+    static bool keyProcessed = false;
 
-			if (!DrawUIRender)
-				CaptureInputs = false;
-		}
-		else if (DrawUIRender)
-		{
-			CaptureInputs = !CaptureInputs;
-		}
-	}
+    if (ImGui::IsKeyDown(ImGuiMod_Alt))
+    {
+        if (!keyProcessed)
+        {
+            if (ImGui::IsKeyDown(ImGuiMod_Ctrl))
+            {
+                DrawUIRender = !DrawUIRender;
+
+                if (!DrawUIRender)
+                    CaptureInputs = false;
+            }
+            else if (DrawUIRender)
+            {
+                CaptureInputs = !CaptureInputs;
+            }
+
+            keyProcessed = true;
+        }
+    }
+    else
+    {
+        keyProcessed = false;
+    }
 
 	ImGuiIO& IO = ImGui::GetIO();
     if (CaptureInputs || g_dedicated_server)

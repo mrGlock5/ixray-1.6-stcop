@@ -285,7 +285,7 @@ bool CRenderDevice::InitRenderDevice(APILevel API)
 				ImGui::EndMenu();
 			}
 
-			ImGui::MenuItem("Click `Alt+A`");
+			ImGui::MenuItem("Click `Alt`");
 			ImGui::EndMainMenuBar();
 		}
 
