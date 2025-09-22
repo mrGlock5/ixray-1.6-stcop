@@ -1624,6 +1624,9 @@ CSVGStorage::AtlasConnection CSVGStorage::try_allocate(const std::string_view& s
 
 		if (was_added)
 		{
+			if (p_existed)
+				result = *p_existed;
+			
 			break;
 		}
 

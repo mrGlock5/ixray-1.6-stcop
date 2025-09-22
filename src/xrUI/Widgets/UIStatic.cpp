@@ -62,6 +62,22 @@ bool CUIStatic::InitTexture(pcstr texture, bool fatal)
     return InitTextureEx(texture, "hud\\default", fatal);
 }
 
+bool CUIStatic::InitTexture(LPCSTR raster_texture_name, LPCSTR svg_texture_name)
+{
+	if (raster_texture_name == nullptr)
+	{
+		return false;
+	}
+
+	LPCSTR res_shname = UIRender->UpdateShaderName(raster_texture_name, "hud\\default");
+	bool result = CUITextureMaster::InitTexture(raster_texture_name, svg_texture_name, &m_UIStaticItem);
+
+	Fvector2 p = GetWndPos();
+	m_UIStaticItem.SetPos(p.x, p.y);
+
+	return result;
+}
+
 void CUIStatic::CreateShader(const char* tex, const char* sh)
 {
     m_UIStaticItem.CreateShader(tex, sh);

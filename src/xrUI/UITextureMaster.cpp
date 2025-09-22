@@ -100,17 +100,17 @@ bool CUITextureMaster::InitTexture(const shared_str& texture_name, const shared_
 bool CUITextureMaster::InitTexture(const shared_str& texture_name, CUIStaticItem* tc, const shared_str& shader_name, bool warn_about_missing_tex)
 {
 	// Step 1 - try to read texture from XML
-	xr_map<shared_str, TEX_INFO>::iterator it	= m_textures.find(texture_name);
+	xr_map<shared_str, TEX_INFO>::iterator it = m_textures.find(texture_name);
 	if (it != m_textures.end())
 	{
-		sh_pair p={it->second.file, shader_name};
+		sh_pair p = { it->second.file, shader_name };
 		xr_map<sh_pair, ui_shader>::iterator sh_it = m_shaders.find(p);
-		if(sh_it==m_shaders.end())
+		if (sh_it == m_shaders.end())
 			m_shaders[p]->create(shader_name.c_str(), it->second.file.c_str());
 
-		tc->SetShader		(m_shaders[p]);
-		tc->SetTextureRect	((*it).second.rect);
-		tc->SetSize			(Fvector2().set(it->second.rect.width(),it->second.rect.height()));
+		tc->SetShader(m_shaders[p]);
+		tc->SetTextureRect((*it).second.rect);
+		tc->SetSize(Fvector2().set(it->second.rect.width(), it->second.rect.height()));
 		return true;
 	}
 	// Step 2 - if texture is not in XML, try to load existing file
@@ -123,6 +123,54 @@ bool CUITextureMaster::InitTexture(const shared_str& texture_name, CUIStaticItem
 	{
 		tc->CreateShader("ed\\ed_not_existing_texture", shader_name.c_str());
 	}
+
+	return false;
+}
+
+bool CUITextureMaster::InitTexture(const shared_str& raster_texture_name, const shared_str& svg_texture_name, CUIStaticItem* tc)
+{
+	R_ASSERT(raster_texture_name.size() > 0 && "must be not empty");
+
+	xr_map<shared_str, TEX_INFO>::iterator it = m_textures.find(raster_texture_name);
+	R_ASSERT(it != m_textures.end() && "must exist otherwise can't obtain correct data for rasterization of svg image based on requested width and requested height!!!");
+
+	if (it != m_textures.end())
+	{
+	//	sh_pair p = { it->second.file, shader_name };
+	//	xr_map<sh_pair, ui_shader>::iterator sh_it = m_shaders.find(p);
+	//	if (sh_it == m_shaders.end())
+	//		m_shaders[p]->create(shader_name.c_str(), it->second.file.c_str());
+
+	//	tc->SetShader(m_shaders[p]);
+	//	tc->SetTextureRect((*it).second.rect);
+	//	tc->SetSize(Fvector2().set(it->second.rect.width(), it->second.rect.height()));
+
+		float fRequestedWidth = (*it).second.rect.width();
+		float fRequestedHeight = (*it).second.rect.height();
+
+		if (svg_texture_name.size() > 0)
+		{
+			const ui_shader& svg_shader = UI().GetVectorShader(svg_texture_name.c_str(), fRequestedWidth, fRequestedHeight);
+			Frect texture_rect = UI().GetVectorUV(svg_texture_name.c_str(), fRequestedWidth, fRequestedHeight);
+
+			tc->SetShader(svg_shader);
+			tc->SetTextureRect(texture_rect);
+			tc->SetSize(Fvector2().set(fRequestedWidth, fRequestedHeight));
+		}
+		else
+		{
+			const ui_shader& default_shader = UI().GetVectorShader(_kDefaultSVGShader, fRequestedWidth, fRequestedHeight);
+			Frect texture_rect = UI().GetVectorUV(_kDefaultSVGShader, fRequestedWidth, fRequestedHeight);
+
+			tc->SetShader(default_shader);
+			tc->SetTextureRect(texture_rect);
+			tc->SetSize(Fvector2().set(fRequestedWidth, fRequestedHeight));
+		}
+
+
+		return true;
+	}
+
 	return false;
 }
 

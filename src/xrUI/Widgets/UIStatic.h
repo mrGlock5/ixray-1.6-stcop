@@ -43,7 +43,7 @@ public:
 	virtual void			Draw					();
 	virtual void			Update					();
 	virtual void			OnFocusLost				();
-
+	bool InitTexture(LPCSTR raster_texture_name, LPCSTR svg_texture_name) override;
 	virtual pcstr GetText() { return TextItemControl()->GetText(); }
 	virtual void SetText(pcstr txt) { TextItemControl()->SetText(txt); }
 	virtual void SetTextST(pcstr txt) { TextItemControl()->SetTextST(txt); }

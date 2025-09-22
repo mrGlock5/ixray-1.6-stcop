@@ -19,6 +19,7 @@ class ITextureOwner
 public:
 	virtual				~ITextureOwner			()												{}	
 	virtual bool		InitTexture				(LPCSTR texture, bool fatal = true)					= 0;
+	virtual bool InitTexture(LPCSTR raster_texture_name, LPCSTR svg_texture_name) { R_ASSERT(false && "provide implementation!"); return false; }
 	virtual bool		InitTextureEx			(LPCSTR texture, LPCSTR shader, bool fatal = true)	= 0;
 	virtual void		SetTextureRect			(const Frect& r)								= 0;
 	virtual const Frect& GetTextureRect			()										const	= 0;

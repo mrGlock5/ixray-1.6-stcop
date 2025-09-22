@@ -987,18 +987,56 @@ bool CUIXmlInit::InitTexture(CUIXml& xml_doc, LPCSTR path, int index, ITextureOw
 	string256 buf;
 	LPCSTR texture	= nullptr;
 	LPCSTR shader	= nullptr;
-	xr_strconcat(buf, path, ":texture");
-	if (xml_doc.NavigateToNode(buf))
+	LPCSTR raster_texture = nullptr;
+
+	bool isRaster = EngineExternal().isRenderingUIRaster();
+
+	if (!isRaster)
 	{
-		texture		= xml_doc.Read(buf, index, nullptr);
-		shader		= xml_doc.ReadAttrib(buf, index, "shader", nullptr);
+		string256 buf2;
+		xr_strconcat(buf2, path, ":svg");
+		isRaster = (!(xml_doc.NavigateToNode(buf2))) && (EngineExternal().isRenderingUIErrorFallbackToDefaultAtlas()==false);
 	}
+
+	if (isRaster)
+	{
+		xr_strconcat(buf, path, ":texture");
+		if (xml_doc.NavigateToNode(buf))
+		{
+			texture = xml_doc.Read(buf, index, nullptr);
+			shader = xml_doc.ReadAttrib(buf, index, "shader", nullptr);
+		}
+	}
+	else
+	{
+		xr_strconcat(buf, path, ":svg");
+		texture = xml_doc.Read(buf, index, nullptr);
+
+		// todo: think how to avoid using raster data at all and use only data what user might specify for <svg> node think about it well, but it requires a lot of testing and time... For now as we use fallback raster version (GSC approach) we can obtain data for proper rasterization but generally saying it is not quite reasonable due to data duplication in terms of like if we want to use only svg without raster legacy data marking through texture_descr folder and etc
+		string256 buf2;
+		xr_strconcat(buf2, path, ":texture");
+		bool status = xml_doc.NavigateToNode(buf2);
+		R_ASSERT(status && "must exist otherwise can't obtain data for rasterization!");
+
+		raster_texture = xml_doc.Read(buf2, index, nullptr);
+		R_ASSERT(strlen(raster_texture) > 0 && "must be not empty!");
+	}
+	
+
+
 	if (texture)
 	{
-		if(shader)
-			result = pWnd->InitTextureEx(texture, shader, fatal);
+		if (isRaster)
+		{
+			if (shader)
+				result = pWnd->InitTextureEx(texture, shader, fatal);
+			else
+				result = pWnd->InitTexture(texture, fatal);
+		}
 		else
-			result = pWnd->InitTexture(texture, fatal);
+		{
+			result = pWnd->InitTexture(raster_texture, texture);
+		}
 	}
 //--------------------
 	Frect			rect;
