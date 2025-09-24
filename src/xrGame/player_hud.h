@@ -274,7 +274,7 @@ public:
 	void			detach_all_items	(){m_attached_items[0]=NULL; m_attached_items[1]=NULL;};
 
 	void			calc_transform		(u16 attach_slot_idx, const Fmatrix& offset, Fmatrix& result);
-	void			tune				(Ivector values);
+	void			tune				(Fvector values);
 	u32				motion_length		(const MotionID& M, const CMotionDef*& md, float speed, IKinematicsAnimated* itemModel);
 	u32				motion_length		(const shared_str& anim_name, const shared_str& hud_name, const CMotionDef*& md);
 	void			OnMovementChanged	(ACTOR_DEFS::EMoveCommand cmd)	;
@@ -296,7 +296,6 @@ public:
 	animator_item* create_animator_item(const shared_str& section);
 	void			delete_animator_item();
 	animator_item* GetAnimator() { return m_animator_item; }
-
 private:
     void			load_ancors			();
 	void			update_inertion		(Fmatrix& trans);
