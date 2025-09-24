@@ -34,6 +34,7 @@ CBurer::CBurer()
  	m_fast_gravi			=	new CBurerFastGravi();
 
  	control().add				(m_fast_gravi,  ControlCom::eComCustom1);
+	m_shield_expire_time	= 0;
 }
 
 CBurer::~CBurer()
@@ -71,14 +72,16 @@ void CBurer::reload(LPCSTR section)
 							u32(MonsterSound::eBaseChannel),	eMonsterSoundTeleAttack, "head");
 }
 
-void CBurer::ActivateShield () 
+void CBurer::ActivateShield()
 {
-	m_shield_active						=	true;
+	m_shield_active = true;
+	m_shield_expire_time = Device.dwTimeGlobal + m_shield_time;
 }
 
-void CBurer::DeactivateShield () 
+void CBurer::DeactivateShield()
 {
-	m_shield_active						=	false;
+	m_shield_active = false;
+	m_shield_expire_time = 0;
 }
 
 void CBurer::Load(LPCSTR section)
@@ -450,7 +453,13 @@ void CBurer::UpdateCL()
 {
 	inherited::UpdateCL();
 
-	if (IsGameTypeSingle())
+	if (OnServer() && m_shield_active && m_shield_expire_time && Device.dwTimeGlobal >= m_shield_expire_time)
+	{
+		DeactivateShield();
+	}
+
+	const bool process_server_logic = IsGameTypeSingle() || OnServer();
+	if (process_server_logic)
 		UpdateGraviObject();
 	else
 		UpdateGraviObjectCL();
