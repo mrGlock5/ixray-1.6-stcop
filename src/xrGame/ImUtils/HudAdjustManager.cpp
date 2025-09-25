@@ -191,7 +191,6 @@ void RenderHUDAdjustManager()
 										}
 									}
 								}
-								if (!(p_item->m_monolithic && p_item->m_parent_hud_item->GetCurrentHudOffsetIdx() == 0))
 								{
 									if (ImGui::CollapsingHeader(hud_header_name))
 									{
@@ -216,15 +215,32 @@ void RenderHUDAdjustManager()
 												ImGui::SeparatorText("Position##HUD");
 
 												Fvector& position = attach_idx ? p_item->m_measures.m_hands_positions.hands_offsets[0][attach_idx] : p_item->m_measures.m_hands_attach_real[0];
-												if (ImGui::Button("Reset##HPosition"))
+												string32 btnName;
+												xr_sprintf(btnName, "Reset##HPosition_%d", attach_idx);
+
+												if (ImGui::Button(btnName))
 												{
 													switch (attach_idx)
 													{
 													case 1:
-														position = pSettings->r_fvector3(p_item->m_sect_name, "aim_hud_offset_pos");
+														if (pSettings->line_exist(p_item->m_sect_name, "aim_hud_offset_pos"))
+														{
+															position = pSettings->r_fvector3(p_item->m_sect_name, "aim_hud_offset_pos");
+														}
+														else
+														{
+															position = pSettings->r_fvector3(p_item->m_sect_name, "zoom_offset");
+														}
 														break;
 													case 2:
-														position = pSettings->r_fvector3(p_item->m_sect_name, "gl_hud_offset_pos");
+														if (pSettings->line_exist(p_item->m_sect_name, "gl_hud_offset_pos"))
+														{
+															position = pSettings->r_fvector3(p_item->m_sect_name, "gl_hud_offset_pos");
+														}
+														else
+														{
+															position = pSettings->r_fvector3(p_item->m_sect_name, "grenade_zoom_offset");
+														}
 														break;
 													default:
 														position = pSettings->r_fvector3(p_item->m_sect_name, "hands_position");
@@ -251,15 +267,34 @@ void RenderHUDAdjustManager()
 												ImGui::SeparatorText("Rotation##HUD");
 
 												Fvector& rotation = attach_idx ? p_item->m_measures.m_hands_positions.hands_offsets[1][attach_idx] : p_item->m_measures.m_hands_attach_real[1];
-												if (ImGui::Button("Reset##HRotation"))
+												xr_sprintf(btnName, "Reset##HRotation_%d", attach_idx);
+												if (ImGui::Button(btnName))
 												{
 													switch (attach_idx)
 													{
 													case 1:
-														rotation = pSettings->r_fvector3(p_item->m_sect_name, "aim_hud_offset_rot");
+														if (pSettings->line_exist(p_item->m_sect_name, "aim_hud_offset_rot"))
+														{
+															rotation = pSettings->r_fvector3(p_item->m_sect_name, "aim_hud_offset_rot");
+														}
+														else
+														{
+															rotation.x = pSettings->r_float(p_item->m_sect_name, "zoom_rotate_x");
+															rotation.y = pSettings->r_float(p_item->m_sect_name, "zoom_rotate_y");
+															rotation.z = READ_IF_EXISTS(pSettings, r_float, p_item->m_sect_name, "zoom_rotate_z", 0.0f);
+														}
 														break;
 													case 2:
-														rotation = pSettings->r_fvector3(p_item->m_sect_name, "gl_hud_offset_rot");
+														if (pSettings->line_exist(p_item->m_sect_name, "gl_hud_offset_rot"))
+														{
+															rotation = pSettings->r_fvector3(p_item->m_sect_name, "gl_hud_offset_rot");
+														}
+														else
+														{
+															rotation.x = pSettings->r_float(p_item->m_sect_name, "grenade_zoom_rotate_x");
+															rotation.y = pSettings->r_float(p_item->m_sect_name, "grenade_zoom_rotate_y");
+															rotation.z = READ_IF_EXISTS(pSettings, r_float, p_item->m_sect_name, "grenade_zoom_rotate_z", 0.0f);
+														}
 														break;
 													default:
 														rotation = pSettings->r_fvector3(p_item->m_sect_name, "hands_orientation");
@@ -286,9 +321,12 @@ void RenderHUDAdjustManager()
 												}
 											};
 
-										if (ImGui::CollapsingHeader("Offset 0 (default)"))
+										if (!p_item->m_monolithic)
 										{
-											drawHudParameters(p_item, 0);
+											if (ImGui::CollapsingHeader("Offset 0 (default)"))
+											{
+												drawHudParameters(p_item, 0);
+											}
 										}
 										if (p_item->m_measures.m_hands_positions.hands_offsets[0][1] != zero_vel)
 										{
@@ -313,7 +351,7 @@ void RenderHUDAdjustManager()
 									Fvector& position = p_item->m_measures.m_item_attach[0];
 									if (ImGui::Button("Reset##IPosition"))
 									{
-										position = pSettings->r_fvector3(p_item->m_sect_name, "item_position");
+										position = READ_IF_EXISTS(pSettings, r_fvector3, p_item->m_sect_name, "item_position", pSettings->r_fvector3(p_item->m_sect_name, "position"));
 									}
 
 									if (ImGui::BeginTable("Data##HUDPI", 1))
@@ -336,7 +374,7 @@ void RenderHUDAdjustManager()
 									Fvector& rotation = p_item->m_measures.m_item_attach[1];
 									if (ImGui::Button("Reset##IRotation"))
 									{
-										rotation = pSettings->r_fvector3(p_item->m_sect_name, "item_orientation");
+										rotation = READ_IF_EXISTS(pSettings, r_fvector3, p_item->m_sect_name, "item_orientation", pSettings->r_fvector3(p_item->m_sect_name, "orientation"));
 									}
 
 									if (ImGui::BeginTable("Data##HUDR", 1))
@@ -437,9 +475,51 @@ void RenderHUDAdjustManager()
 							}
 						};
 
+					auto writeParamsLegacy = [](attachable_hud_item* p_item, CInifile& file) -> void
+						{
+							string64 sect = "";
+							xr_sprintf(sect, sizeof(sect), p_item->m_sect_name.c_str());
+
+							file.w_fvector3(sect, "position", p_item->m_measures.m_item_attach[0]);
+							file.w_fvector3(sect, "orientation", p_item->m_measures.m_item_attach[1]);
+
+							if (p_item->m_measures.m_prop_flags.test(p_item->m_measures.e_shell_point))
+							{
+								file.w_fvector3(sect, "shell_point", p_item->m_measures.m_shell_point_offset);
+							}
+							if (p_item->m_measures.m_prop_flags.test(p_item->m_measures.e_fire_point))
+							{
+								file.w_fvector3(sect, "fire_point", p_item->m_measures.m_fire_point_offset);
+							}
+							if (p_item->m_measures.m_prop_flags.test(p_item->m_measures.e_fire_point2))
+							{
+								file.w_fvector3(sect, "fire_point2", p_item->m_measures.m_fire_point2_offset);
+							}
+
+							if (p_item->m_measures.m_hands_positions.hands_offsets[0][1] != zero_vel)
+							{
+								file.w_fvector3(sect, "zoom_offset", p_item->m_measures.m_hands_positions.hands_offsets[0][1]);
+								file.w_float(sect, "zoom_rotate_x", p_item->m_measures.m_hands_positions.hands_offsets[1][1].x);
+								file.w_float(sect, "zoom_rotate_y", p_item->m_measures.m_hands_positions.hands_offsets[1][1].y);
+								if (!fis_zero(p_item->m_measures.m_hands_positions.hands_offsets[1][1].z))
+									file.w_float(sect, "zoom_rotate_z", p_item->m_measures.m_hands_positions.hands_offsets[1][1].z);
+							}
+							if (p_item->m_measures.m_hands_positions.hands_offsets[0][2] != zero_vel)
+							{
+								file.w_fvector3(sect, "grenade_zoom_offset", p_item->m_measures.m_hands_positions.hands_offsets[0][1]);
+								file.w_float(sect, "grenade_zoom_rotate_x", p_item->m_measures.m_hands_positions.hands_offsets[1][1].x);
+								file.w_float(sect, "grenade_zoom_rotate_y", p_item->m_measures.m_hands_positions.hands_offsets[1][1].y);
+								if (!fis_zero(p_item->m_measures.m_hands_positions.hands_offsets[1][1].z))
+									file.w_float(sect, "grenade_zoom_rotate_z", p_item->m_measures.m_hands_positions.hands_offsets[1][1].z);
+							}
+						};
+
 					if (p_hud_item_first)
 					{
-						writeParams(p_hud_item_first, file);
+						if (!p_hud_item_first->m_monolithic)
+							writeParams(p_hud_item_first, file);
+						else
+							writeParamsLegacy(p_hud_item_first, file);
 					}
 					if (p_hud_item_second)
 					{
