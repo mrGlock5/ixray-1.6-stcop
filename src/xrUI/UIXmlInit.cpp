@@ -164,6 +164,7 @@ bool CUIXmlInit::InitStatic(CUIXml& xml_doc, LPCSTR path,
 	R_ASSERT4(ValidNode, "XML node not found", path, xml_doc.m_xml_file_name);
 
 	InitWindow			(xml_doc, path, index, pWnd);
+	pWnd->InitSVG(xml_doc, path, index);
 
 	string256			buf;
 	InitText			(xml_doc, xr_strconcat(buf,path,":text"), index, pWnd);

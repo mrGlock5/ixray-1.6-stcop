@@ -79,6 +79,7 @@ CUIMainIngameWnd::CUIMainIngameWnd()
 :/*m_pGrenade(nullptr),m_pItem(nullptr),*/m_pPickUpItem(nullptr),m_pMPChatWnd(nullptr),UIArtefactIcon(nullptr),m_pMPLogWnd(nullptr)
 {
 	UIZoneMap					= new CUIZoneMap();
+	m_ind_bleeding_svg_inited = false;
 }
 
 #include "../../xrUI/Widgets/UIProgressShape.h"
@@ -162,6 +163,45 @@ void CUIMainIngameWnd::Init()
 		m_ind_outfit_broken		= UIHelper::CreateStatic(uiXml, "indicator_outfit_broken", this);
 	if (uiXml.NavigateToNode("indicator_overweight", 0))
 		m_ind_overweight		= UIHelper::CreateStatic(uiXml, "indicator_overweight", this);
+
+	bool isRaster = EngineExternal().isRenderingUIRaster();
+
+	// todo: refactor and make function that accept CUIStatic and initialize others...
+	if (!isRaster)
+	{
+		if (
+			m_ind_bleeding->isSVGPresented())
+		{
+			LPCSTR pSVGFilename = m_ind_bleeding->getSVGFilename(uiXml, "indicator_bleeding", 0);
+
+			if (pSVGFilename)
+			{
+				Fvector2 scaled_w_and_h;
+				UI().ClientToScreenScaled(scaled_w_and_h, m_ind_bleeding->GetWidth(), m_ind_bleeding->GetHeight());
+
+				float fRequestedWidth = scaled_w_and_h.x;
+				float fRequestedHeight = scaled_w_and_h.y;
+
+				const ui_shader& svg_shader = UI().GetVectorShader(pSVGFilename, fRequestedWidth, fRequestedHeight);
+				const Frect& svg_uv = UI().GetVectorUV(pSVGFilename, fRequestedWidth, fRequestedHeight);
+
+				m_ind_bleeding->SetShader(svg_shader);
+				m_ind_bleeding->SetTextureRect(svg_uv);
+
+				// virtual callings are not cheap and for runtime better to reduce that overhead tbh so we have to cache at init stage 
+				m_ind_bleeding_svg_inited = true;
+			}
+		}
+#ifdef DEBUG
+		else
+		{
+			Msg("! [svg]: nor attribute nor nested node was presented for <%s>", "indicator_bleeding");
+		}
+#endif
+
+
+	}
+
 
 	if (!IsGameTypeSingle())
 	{
@@ -848,19 +888,59 @@ void CUIMainIngameWnd::UpdateMainIndicators()
 		else
 		{
 			m_ind_bleeding->Show(true);
+
+			u32 texColor = m_ind_bleeding->GetTextureColor();
+			_color casted(texColor);
+
+
 			if (bleeding < 0.35f)
 			{
-				m_ind_bleeding->InitTexture("ui_inGame2_circle_bloodloose_green");
+				if (!m_ind_bleeding_svg_inited)
+				{
+					m_ind_bleeding->InitTexture("ui_inGame2_circle_bloodloose_green");
+				}
+				else
+				{
+					casted.r = 0.0f;
+					casted.g = 100.0f / 255.0f;
+					casted.b = 0.0f;
+					
+					m_ind_bleeding->SetTextureColor(casted.get());
+				}
+
 				m_ind_bleeding->SetColorAnimation("ui_slow_blinking_alpha", flags);
 			}
 			else if (bleeding < 0.7f)
 			{
-				m_ind_bleeding->InitTexture("ui_inGame2_circle_bloodloose_yellow");
-				m_ind_bleeding->SetColorAnimation("ui_medium_blinking_alpha", flags);
+				if (!m_ind_bleeding_svg_inited)
+				{
+					m_ind_bleeding->InitTexture("ui_inGame2_circle_bloodloose_yellow");
+				}
+				else
+				{
+					casted.r = 180.0f / 255.0f;
+					casted.g = 100.0f / 255.0f;
+					casted.b = 0.0f;
+
+					m_ind_bleeding->SetTextureColor(casted.get());
+				}
+
+				m_ind_bleeding->SetColorAnimation("	", flags);
 			}
 			else
 			{
-				m_ind_bleeding->InitTexture("ui_inGame2_circle_bloodloose_red");
+				if (!m_ind_bleeding_svg_inited)
+				{
+					m_ind_bleeding->InitTexture("ui_inGame2_circle_bloodloose_red");
+				}
+				else
+				{
+					casted.r = 200.0f / 255.0f;
+					casted.g = 0.0f;
+					casted.b = 0.0f;
+
+					m_ind_bleeding->SetTextureColor(casted.get());
+				}
 				m_ind_bleeding->SetColorAnimation("ui_fast_blinking_alpha", flags);
 			}
 		}

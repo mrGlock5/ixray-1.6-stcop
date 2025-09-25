@@ -100,6 +100,9 @@ protected:
 
 	// Car
 	CUICarPanel UICarPanel;
+
+
+	bool m_ind_bleeding_svg_inited;
 public:
 	
 	// Енумы соответсвующие предупреждающим иконкам 

@@ -7,6 +7,8 @@
 
 typedef CGameFont::EAligment ETextAlignment;
 
+class CUIXml;
+
 typedef enum 
 {
 	valTop = 0,
@@ -97,7 +99,14 @@ public:
 	}
 				void		MoveWndDelta		(float dx, float dy)					{m_wndPos.x+=dx;m_wndPos.y+=dy;}
 				void		MoveWndDelta		(const Fvector2& d)						{MoveWndDelta(d.x, d.y);	};
+				// supposed to be a place for init attribs or nested nodes of xml where svg is defined (aka filename with format like <svg>image.svg</svg> or <xml_node svg="image.svg"/>)
+				virtual void InitSVG(CUIXml& xml_doc, LPCSTR path, int index) {
+					R_ASSERT(!"provide implementation");
+				}
 
+				virtual bool isSVGPresented(void) const { R_ASSERT(!"provide implementation"); return false; }
+
+				virtual LPCSTR getSVGFilename(CUIXml& xml_doc, LPCSTR path, int index = 0 ) { R_ASSERT(!"provide implementation"); return nullptr; }
 protected:
 	bool					m_bShowMe;
 	Fvector2				m_wndPos;
