@@ -68,7 +68,7 @@ float4 sample_reflections(float2 tc, float3x3 TBNw_inv, float3 w_pos, float3 w_n
 float4 sample_dirt(float2 tc, float3 w_nrm)
 {	
 	float4 color = s_base.Sample(smp_rtlinear, float2(tc.x / 2, tc.y / 2 + 0.5));
-	return float4(color.rgb * 2 * calc_model_lq_lighting(w_nrm), color.a);
+	return float4(color.rgb * 2, color.a);
 }
 
 float4 rgba_blend(float4 b, float4 a)
