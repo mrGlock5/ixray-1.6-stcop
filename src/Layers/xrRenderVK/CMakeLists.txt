@@ -36,20 +36,9 @@ target_precompile_headers(xrRender_VK PRIVATE "stdafx.h")
 target_include_directories(xrRender_VK PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_include_directories(xrRender_VK PUBLIC "${IXRAY_SDK_INC}")
 
-find_package(Vulkan REQUIRED)
-
-if (NOT Vulkan_FOUND)
-    message(FATAL_ERROR "Vulkan SDK not found. You should install via your OS's package manager (if it is linux) or if it is Windows download official Vulkan SDK from developer site -> https://vulkan.lunarg.com/sdk/home")
-endif()
-
-message(STATUS "Vulkan include dirs: ${Vulkan_INCLUDE_DIRS}")
-message(STATUS "Vulkan libraries: ${Vulkan_LIBRARIES}")
-
-target_include_directories(xrRender_VK PUBLIC ${Vulkan_INCLUDE_DIRS})
-
 # Project defines
 target_compile_definitions(xrRender_VK PRIVATE XRRENDER_VK_EXPORTS)
-target_compile_definitions(xrRender_VK PRIVATE USE_VULKAN)
+target_compile_definitions(xrRender_VK PRIVATE USE_VK)
 # Force fallback (no D3D) only on non-Windows platforms; keep D3D available on Windows to avoid disabling DX for users.
 if(NOT WIN32 OR IXRAY_VK_STRICT_NO_D3D)
     target_compile_definitions(xrRender_VK PRIVATE XR_FORCE_NO_D3D)
@@ -60,4 +49,6 @@ target_compile_definitions(xrRender_VK PRIVATE "$<$<CONFIG:Debug>:DEBUG>")
 # Linker list
 target_link_libraries(xrRender_VK PUBLIC xrAbstractions)
 target_link_libraries(xrRender_VK PUBLIC xrParticles)
-target_link_libraries(xrRender_VK PUBLIC ${Vulkan_LIBRARIES})
+target_link_libraries(xrRender_VK PUBLIC 
+    Vulkan::Vulkan
+)

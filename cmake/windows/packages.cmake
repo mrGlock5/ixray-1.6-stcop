@@ -76,3 +76,16 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(SPIRV-Tools)
 
 message(STATUS "[packages] SPIRV-Tools - downloaded!")
+
+add_library(Vulkan::Vulkan INTERFACE IMPORTED GLOBAL)
+
+target_link_libraries(Vulkan::Vulkan INTERFACE 
+                      Vulkan::Headers 
+                      Vulkan::Loader
+                      Vulkan::LayerSettings
+                      Vulkan::UtilityHeaders
+                      Vulkan::SafeStruct
+                      SPIRV-Headers
+                      SPIRV-Tools
+                      VkLayer_utils
+)
