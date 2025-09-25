@@ -16,6 +16,11 @@
 #define		R_R2	2
 #define		R_R4	4
 #define		R_VK	5
+
+#ifdef USE_VK
+#define		R_R5	R_VK
+#endif
+
 #define		RENDER	R_VK
 
 #include "../../xrParticles/psystem.h"
@@ -33,4 +38,3 @@
 #include "../xrRender/blenders/Blender.h"
 #include "../xrRender/blenders/Blender_CLSID.h"
 #include "../xrRender/xrRender_console.h"
-#include "vk.h"
