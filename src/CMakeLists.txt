@@ -10,16 +10,9 @@ add_subdirectory("xrCore")
 # Option globale pour forcer la désactivation des chemins D3D (utilise les stubs dans R_DStreams/FVF)
 option(IXRAY_FORCE_NO_D3D "Force disable Direct3D code paths and use fallback stream/FVF implementations" OFF)
 
-# Heuristique auto : si Vulkan est activé mais ni R1 ni R2 ne le sont, on peut forcer no D3D sauf sur Windows client.
-if(IXRAY_USE_VK AND NOT IXRAY_USE_R1 AND NOT IXRAY_USE_R2)
-    if (WIN32)
-        # Ne pas activer automatiquement sur Windows pour laisser le rendu D3D disponible sauf demande explicite.
-    else()
-        if(NOT IXRAY_FORCE_NO_D3D)
-            set(IXRAY_FORCE_NO_D3D ON)
-            message(STATUS "[IXRAY] Auto-enabled IXRAY_FORCE_NO_D3D (Vulkan-only configuration detected).")
-        endif()
-    endif()
+if ("${IXRAY_USE_VK}" STREQUAL "")
+    set(IXRAY_USE_VK ON)
+    message(STATUS "[ixray]: enabling VK by default")
 endif()
 
 if(IXRAY_FORCE_NO_D3D)
@@ -103,6 +96,7 @@ if(WIN32)
 
     if (NOT IXRAY_COMPRESSOR_ONLY AND IXR_TEST_CI)
         set_target_properties(xrRender_R4 PROPERTIES ${IXRAY_FOLDER_RENDER})
+
         if(IXRAY_USE_VK)
             set_target_properties(xrRender_VK PROPERTIES ${IXRAY_FOLDER_RENDER})
         endif()
