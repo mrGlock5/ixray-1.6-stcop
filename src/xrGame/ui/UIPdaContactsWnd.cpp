@@ -74,7 +74,7 @@ void CUIPdaContactsWnd::Init()
 	UIFrameContacts->AttachChild		(UIListWnd);
 	xml_init.InitScrollView				(uiXml, "list", 0, UIListWnd);
 
-	UIDetailsWnd						= UIHelper::CreateScrollView(uiXml, "detail_list", UIFrameContacts, false);
+	UIDetailsWnd						= UIHelper::CreateScrollView(uiXml, "detail_list", UIRightFrame, false);
 
 	if (uiXml.NavigateToNode("hint_wnd"))
 	{
