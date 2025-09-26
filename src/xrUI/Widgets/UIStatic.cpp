@@ -71,7 +71,7 @@ bool CUIStatic::InitTexture(LPCSTR raster_texture_name, LPCSTR svg_texture_name)
 	}
 
 	LPCSTR res_shname = UIRender->UpdateShaderName(raster_texture_name, "hud\\default");
-	bool result = CUITextureMaster::InitTexture(raster_texture_name, svg_texture_name, &m_UIStaticItem);
+	bool result = CUITextureMaster::InitTexture(raster_texture_name, svg_texture_name, &m_UIStaticItem, GetWidth(), GetHeight());
 
 	Fvector2 p = GetWndPos();
 	m_UIStaticItem.SetPos(p.x, p.y);

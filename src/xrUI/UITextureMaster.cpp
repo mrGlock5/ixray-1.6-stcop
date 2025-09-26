@@ -127,7 +127,7 @@ bool CUITextureMaster::InitTexture(const shared_str& texture_name, CUIStaticItem
 	return false;
 }
 
-bool CUITextureMaster::InitTexture(const shared_str& raster_texture_name, const shared_str& svg_texture_name, CUIStaticItem* tc)
+bool CUITextureMaster::InitTexture(const shared_str& raster_texture_name, const shared_str& svg_texture_name, CUIStaticItem* tc, float fWidgetWidth, float fWidgetHeight)
 {
 	R_ASSERT(raster_texture_name.size() > 0 && "must be not empty");
 
@@ -145,8 +145,14 @@ bool CUITextureMaster::InitTexture(const shared_str& raster_texture_name, const 
 	//	tc->SetTextureRect((*it).second.rect);
 	//	tc->SetSize(Fvector2().set(it->second.rect.width(), it->second.rect.height()));
 
-		float fRequestedWidth = (*it).second.rect.width();
-		float fRequestedHeight = (*it).second.rect.height();
+		float fRequestedWidth = fWidgetWidth;
+		float fRequestedHeight = fWidgetHeight;
+
+		Fvector2 scaled;
+		UI().ClientToScreenScaled(scaled, fRequestedWidth, fRequestedHeight);
+
+		fRequestedWidth = scaled.x;
+		fRequestedHeight = scaled.y;
 
 		if (svg_texture_name.size() > 0)
 		{
