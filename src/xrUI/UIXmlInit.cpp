@@ -1036,7 +1036,8 @@ bool CUIXmlInit::InitTexture(CUIXml& xml_doc, LPCSTR path, int index, ITextureOw
 		}
 		else
 		{
-			result = pWnd->InitTexture(raster_texture, texture);
+			// we don't depend on raster texture at all so just specify <svg> in xml
+			result = pWnd->InitTexture("", texture);
 		}
 	}
 //--------------------

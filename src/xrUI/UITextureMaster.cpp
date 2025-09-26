@@ -127,15 +127,8 @@ bool CUITextureMaster::InitTexture(const shared_str& texture_name, CUIStaticItem
 	return false;
 }
 
-bool CUITextureMaster::InitTexture(const shared_str& raster_texture_name, const shared_str& svg_texture_name, CUIStaticItem* tc, float fWidgetWidth, float fWidgetHeight)
+bool CUITextureMaster::InitTexture(const shared_str& svg_texture_name, CUIStaticItem* tc, float fWidgetWidth, float fWidgetHeight)
 {
-	R_ASSERT(raster_texture_name.size() > 0 && "must be not empty");
-
-	xr_map<shared_str, TEX_INFO>::iterator it = m_textures.find(raster_texture_name);
-	R_ASSERT(it != m_textures.end() && "must exist otherwise can't obtain correct data for rasterization of svg image based on requested width and requested height!!!");
-
-	if (it != m_textures.end())
-	{
 	//	sh_pair p = { it->second.file, shader_name };
 	//	xr_map<sh_pair, ui_shader>::iterator sh_it = m_shaders.find(p);
 	//	if (sh_it == m_shaders.end())
@@ -174,10 +167,7 @@ bool CUITextureMaster::InitTexture(const shared_str& raster_texture_name, const 
 		}
 
 
-		return true;
-	}
-
-	return false;
+	return true;
 }
 
 Frect CUITextureMaster::GetTextureRect(const shared_str&  texture_name){
