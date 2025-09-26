@@ -109,6 +109,15 @@ protected:
 	bool m_ind_overweight_svg_inited;
 	bool m_ind_radiation_svg_inited;
 	bool m_ind_starvation_svg_inited;
+
+	bool m_ind_boost_psy_svg_inited;
+	bool m_ind_boost_radia_svg_inited;
+	bool m_ind_boost_chem_svg_inited;
+	bool m_ind_boost_wound_svg_inited;
+	bool m_ind_boost_weight_svg_inited;
+	bool m_ind_boost_health_svg_inited;
+	bool m_ind_boost_power_svg_inited;
+	bool m_ind_boost_rad_svg_inited;
 public:
 	
 	// Енумы соответсвующие предупреждающим иконкам 

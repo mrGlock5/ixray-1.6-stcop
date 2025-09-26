@@ -86,6 +86,15 @@ CUIMainIngameWnd::CUIMainIngameWnd()
 	m_ind_overweight_svg_inited = false;
 	m_ind_radiation_svg_inited = false;
 	m_ind_starvation_svg_inited = false;
+
+	m_ind_boost_psy_svg_inited = false;
+	m_ind_boost_radia_svg_inited = false;
+	m_ind_boost_chem_svg_inited = false;
+	m_ind_boost_wound_svg_inited = false;
+	m_ind_boost_weight_svg_inited = false;
+	m_ind_boost_health_svg_inited = false;
+	m_ind_boost_power_svg_inited = false;
+	m_ind_boost_rad_svg_inited = false;
 }
 
 #include "../../xrUI/Widgets/UIProgressShape.h"
@@ -172,44 +181,44 @@ void CUIMainIngameWnd::Init()
 
 	bool isRaster = EngineExternal().isRenderingUIRaster();
 
+	auto pInitSVGForCUIStatic = [](CUIStatic* pElement, CUIXml& uiXml, bool& svg_init) -> void {
+		if (
+			pElement->isSVGPresented() && EngineExternal().isRenderingUIRaster()==false)
+		{
+			R_ASSERT(pElement->WindowNodeName().size() > 0 && "must be valid! otherwise you passed invalid or not initialized element");
+
+			LPCSTR pSVGFilename = pElement->getSVGFilename(uiXml, pElement->WindowNodeName().c_str(), 0);
+
+			if (pSVGFilename)
+			{
+				Fvector2 scaled_w_and_h;
+				UI().ClientToScreenScaled(scaled_w_and_h, pElement->GetWidth(), pElement->GetHeight());
+
+				float fRequestedWidth = scaled_w_and_h.x;
+				float fRequestedHeight = scaled_w_and_h.y;
+
+				const ui_shader& svg_shader = UI().GetVectorShader(pSVGFilename, fRequestedWidth, fRequestedHeight);
+				const Frect& svg_uv = UI().GetVectorUV(pSVGFilename, fRequestedWidth, fRequestedHeight);
+
+				pElement->SetShader(svg_shader);
+				pElement->SetTextureRect(svg_uv);
+
+				// virtual callings are not cheap and for runtime better to reduce that overhead tbh so we have to cache at init stage 
+				svg_init = true;
+			}
+		}
+#ifdef DEBUG
+		else
+		{
+			Msg("! [svg]: nor attribute nor nested node was presented for <%s>", pElement->WindowNodeName().c_str());
+		}
+#endif
+
+		};
+
 	// todo: refactor and make function that accept CUIStatic and initialize others...
 	if (!isRaster)
 	{
-
-		auto pInitSVGForCUIStatic = [](CUIStatic* pElement, CUIXml& uiXml, bool& svg_init) -> void {
-			if (
-				pElement->isSVGPresented())
-			{
-				R_ASSERT(pElement->WindowNodeName().size() > 0 && "must be valid! otherwise you passed invalid or not initialized element");
-
-				LPCSTR pSVGFilename = pElement->getSVGFilename(uiXml, pElement->WindowNodeName().c_str(), 0);
-
-				if (pSVGFilename)
-				{
-					Fvector2 scaled_w_and_h;
-					UI().ClientToScreenScaled(scaled_w_and_h, pElement->GetWidth(), pElement->GetHeight());
-
-					float fRequestedWidth = scaled_w_and_h.x;
-					float fRequestedHeight = scaled_w_and_h.y;
-
-					const ui_shader& svg_shader = UI().GetVectorShader(pSVGFilename, fRequestedWidth, fRequestedHeight);
-					const Frect& svg_uv = UI().GetVectorUV(pSVGFilename, fRequestedWidth, fRequestedHeight);
-
-					pElement->SetShader(svg_shader);
-					pElement->SetTextureRect(svg_uv);
-
-					// virtual callings are not cheap and for runtime better to reduce that overhead tbh so we have to cache at init stage 
-					svg_init = true;
-				}
-			}
-#ifdef DEBUG
-			else
-			{
-				Msg("! [svg]: nor attribute nor nested node was presented for <%s>", pElement->WindowNodeName().c_str());
-			}
-#endif
-			
-			};
 
 		pInitSVGForCUIStatic(m_ind_bleeding, uiXml, m_ind_bleeding_svg_inited);
 
