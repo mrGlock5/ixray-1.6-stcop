@@ -103,6 +103,12 @@ protected:
 
 
 	bool m_ind_bleeding_svg_inited;
+	bool m_ind_weapon_broken_svg_inited;
+	bool m_ind_helmet_broken_svg_inited;
+	bool m_ind_outfit_broken_svg_inited;
+	bool m_ind_overweight_svg_inited;
+	bool m_ind_radiation_svg_inited;
+	bool m_ind_starvation_svg_inited;
 public:
 	
 	// Енумы соответсвующие предупреждающим иконкам 

@@ -80,6 +80,12 @@ CUIMainIngameWnd::CUIMainIngameWnd()
 {
 	UIZoneMap					= new CUIZoneMap();
 	m_ind_bleeding_svg_inited = false;
+	m_ind_weapon_broken_svg_inited = false;
+	m_ind_helmet_broken_svg_inited = false;
+	m_ind_outfit_broken_svg_inited = false;
+	m_ind_overweight_svg_inited = false;
+	m_ind_radiation_svg_inited = false;
+	m_ind_starvation_svg_inited = false;
 }
 
 #include "../../xrUI/Widgets/UIProgressShape.h"
@@ -169,36 +175,50 @@ void CUIMainIngameWnd::Init()
 	// todo: refactor and make function that accept CUIStatic and initialize others...
 	if (!isRaster)
 	{
-		if (
-			m_ind_bleeding->isSVGPresented())
-		{
-			LPCSTR pSVGFilename = m_ind_bleeding->getSVGFilename(uiXml, "indicator_bleeding", 0);
 
-			if (pSVGFilename)
+		auto pInitSVGForCUIStatic = [](CUIStatic* pElement, CUIXml& uiXml, bool& svg_init) -> void {
+			if (
+				pElement->isSVGPresented())
 			{
-				Fvector2 scaled_w_and_h;
-				UI().ClientToScreenScaled(scaled_w_and_h, m_ind_bleeding->GetWidth(), m_ind_bleeding->GetHeight());
+				R_ASSERT(pElement->WindowNodeName().size() > 0 && "must be valid! otherwise you passed invalid or not initialized element");
 
-				float fRequestedWidth = scaled_w_and_h.x;
-				float fRequestedHeight = scaled_w_and_h.y;
+				LPCSTR pSVGFilename = pElement->getSVGFilename(uiXml, pElement->WindowNodeName().c_str(), 0);
 
-				const ui_shader& svg_shader = UI().GetVectorShader(pSVGFilename, fRequestedWidth, fRequestedHeight);
-				const Frect& svg_uv = UI().GetVectorUV(pSVGFilename, fRequestedWidth, fRequestedHeight);
+				if (pSVGFilename)
+				{
+					Fvector2 scaled_w_and_h;
+					UI().ClientToScreenScaled(scaled_w_and_h, pElement->GetWidth(), pElement->GetHeight());
 
-				m_ind_bleeding->SetShader(svg_shader);
-				m_ind_bleeding->SetTextureRect(svg_uv);
+					float fRequestedWidth = scaled_w_and_h.x;
+					float fRequestedHeight = scaled_w_and_h.y;
 
-				// virtual callings are not cheap and for runtime better to reduce that overhead tbh so we have to cache at init stage 
-				m_ind_bleeding_svg_inited = true;
+					const ui_shader& svg_shader = UI().GetVectorShader(pSVGFilename, fRequestedWidth, fRequestedHeight);
+					const Frect& svg_uv = UI().GetVectorUV(pSVGFilename, fRequestedWidth, fRequestedHeight);
+
+					pElement->SetShader(svg_shader);
+					pElement->SetTextureRect(svg_uv);
+
+					// virtual callings are not cheap and for runtime better to reduce that overhead tbh so we have to cache at init stage 
+					svg_init = true;
+				}
 			}
-		}
 #ifdef DEBUG
-		else
-		{
-			Msg("! [svg]: nor attribute nor nested node was presented for <%s>", "indicator_bleeding");
-		}
+			else
+			{
+				Msg("! [svg]: nor attribute nor nested node was presented for <%s>", pElement->WindowNodeName().c_str());
+			}
 #endif
+			
+			};
 
+		pInitSVGForCUIStatic(m_ind_bleeding, uiXml, m_ind_bleeding_svg_inited);
+
+		pInitSVGForCUIStatic(m_ind_weapon_broken, uiXml, m_ind_weapon_broken_svg_inited);
+		pInitSVGForCUIStatic(m_ind_helmet_broken, uiXml, m_ind_helmet_broken_svg_inited);
+		pInitSVGForCUIStatic(m_ind_outfit_broken, uiXml, m_ind_outfit_broken_svg_inited);
+		pInitSVGForCUIStatic(m_ind_overweight, uiXml, m_ind_overweight_svg_inited);
+		pInitSVGForCUIStatic(m_ind_radiation, uiXml, m_ind_radiation_svg_inited);
+		pInitSVGForCUIStatic(m_ind_starvation, uiXml, m_ind_starvation_svg_inited);
 
 	}
 
