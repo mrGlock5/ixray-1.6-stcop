@@ -1378,6 +1378,10 @@ const FactoryPtr<IUIShader>& CSVGStorage::get_shader(const std::string_view& sub
 					{
 						CTextureAtlas::element_lookupid_type element_id = j + (i * _kSVGStorage_MaxElementsPerAtlas);
 
+						// no avaiable so our searching is done
+						if (lookup_list.elements_per_atlas[element_id] == CTextureAtlas::element_lookupid_type(-1))
+							break;
+						
 						const CTextureAtlas::CTextureAtlasElement& element = elements[lookup_list.elements_per_atlas[element_id]];
 
 						if (element.w() == int(requested_width) && element.h() == int(requested_height))
