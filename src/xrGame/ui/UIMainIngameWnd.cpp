@@ -804,7 +804,7 @@ void CUIMainIngameWnd::UpdatePickUpItem	()
 
 		if (pSettings->line_exist(sect_name, kUIConfigField_InventoryVectorIcon))
 		{
-			std::string_view icon_subpath = pSettings->r_string(sect_name, kUIConfigField_InventoryVectorIcon);
+			xr_string_view icon_subpath = pSettings->r_string(sect_name, kUIConfigField_InventoryVectorIcon);
 
 			if (icon_subpath.empty() == false)
 			{
@@ -1198,8 +1198,22 @@ void CUIMainIngameWnd::UpdateQuickSlots()
 				wnd->TextItemControl()->SetText(str);
 				wnd->Show(true);
 
-				const char* icons_texture = READ_IF_EXISTS(pSettings, r_string, item_name.c_str(), "icons_texture", nullptr);
-				slot->SetShader(InventoryUtilities::GetEquipmentIconsShader(icons_texture));
+				bool isRaster = EngineExternal().isRenderingUIRaster();
+
+				if (!isRaster)
+				{
+					if (EngineExternal().isRenderingUIErrorFallbackToDefaultAtlas() == false)
+					{
+						isRaster = !(pSettings->line_exist(item_name, kUIConfigField_InventoryVectorIcon));
+					}
+				}
+
+
+				if (isRaster)
+				{
+					const char* icons_texture = READ_IF_EXISTS(pSettings, r_string, item_name.c_str(), "icons_texture", nullptr);
+					slot->SetShader(InventoryUtilities::GetEquipmentIconsShader(icons_texture));
+				}
 
 				Frect texture_rect;
 				texture_rect.x1 = pSettings->r_float(item_name, "inv_grid_x") * INV_GRID_WIDTH(isHQIcons);
@@ -1207,7 +1221,37 @@ void CUIMainIngameWnd::UpdateQuickSlots()
 				texture_rect.x2 = pSettings->r_float(item_name, "inv_grid_width") * INV_GRID_WIDTH(isHQIcons);
 				texture_rect.y2 = pSettings->r_float(item_name, "inv_grid_height") * INV_GRID_HEIGHT(isHQIcons);
 				texture_rect.rb.add(texture_rect.lt);
-				slot->SetTextureRect(texture_rect);
+
+
+
+				if (isRaster)
+				{
+					slot->SetTextureRect(texture_rect);
+				}
+				else
+				{
+					float fWidth = texture_rect.width();
+					float fHeight = texture_rect.height();
+
+					xr_string_view svg_icon_name = pSettings->r_string(item_name, kUIConfigField_InventoryVectorIcon);
+
+					if (svg_icon_name.empty() == false)
+					{
+						const ui_shader& svg_shader = UI().GetVectorShader(svg_icon_name, fWidth, fHeight);
+						texture_rect = UI().GetVectorUV(svg_icon_name, fWidth, fHeight);
+						slot->SetShader(svg_shader);
+						slot->SetTextureRect(texture_rect);
+					}
+					else
+					{
+						const ui_shader& default_shader = UI().GetVectorShader(_kDefaultSVGShader, fWidth, fHeight);
+						texture_rect = UI().GetVectorUV(_kDefaultSVGShader, fWidth, fHeight);
+						slot->SetShader(default_shader);
+						slot->SetTextureRect(texture_rect);
+					}
+				}
+
+
 				slot->TextureOn();
 				slot->SetStretchTexture(true);
 				if (!count)
