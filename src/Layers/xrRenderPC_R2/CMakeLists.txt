@@ -76,5 +76,4 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ${CMAKE_BINARY_DIR}/packages/direct
 target_include_directories(${PROJECT_NAME} PUBLIC "${RENDERDOC_API}")
 
 ## lunaSVG
-
 target_link_libraries(${PROJECT_NAME} PUBLIC lunasvg)

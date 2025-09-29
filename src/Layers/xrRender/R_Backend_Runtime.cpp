@@ -1667,7 +1667,7 @@ CSVGStorage::AtlasConnection CSVGStorage::allocate(const std::string_view& subpa
 
 		bool data_insert_status = this->add_data(subpath, requested_width, requested_height, atlas, result);
 
-		R_ASSERT(data_insert_status, "failed to insert data to atlas");
+		R_ASSERT2(data_insert_status, "failed to insert data to atlas");
 
 		if (data_insert_status)
 		{

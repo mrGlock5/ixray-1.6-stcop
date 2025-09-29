@@ -126,6 +126,7 @@ file(GLOB_RECURSE ECORE_SOURCE_RENDER_FILES CONFIGURE_DEPENDS
 	"../../Layers/xrRenderPC_R1/Blender_Shadow_World.*"
 	"../../Layers/xrRenderPC_R1/Blender_Vertex_aref.*"
 	"../../Layers/xrRenderPC_R1/Blender_Vertex.*"
+	"../../Layers/xrRender/smol-atlas.*"
 )
 
 file(GLOB_RECURSE ECORE_SOURCE_EXT_FILES CONFIGURE_DEPENDS
@@ -225,3 +226,6 @@ target_include_directories(xrECore PRIVATE "${SNDE_VOB}/native/include/")
 ## OpenAL
 target_link_libraries(xrECore PRIVATE ${SNDE_OAL}/native/lib/${CMAKE_VS_PLATFORM_NAME}/Release/OpenAL32.lib)
 target_include_directories(xrECore PRIVATE "${SNDE_OAL}/native/include/")
+
+## lunaSVG
+target_link_libraries(${PROJECT_NAME} PUBLIC lunasvg)
