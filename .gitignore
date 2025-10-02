@@ -25,6 +25,7 @@ build/
 build_win32/
 build32/
 build_nounity/
+build*/**
 
 # Common logs
 *.log
