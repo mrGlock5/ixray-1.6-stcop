@@ -65,6 +65,6 @@ public:
 	CResourceManager*	Resources;
 	ref_shader			m_WireShader;
 	ref_shader			m_SelectionShader;
-
+	FactoryPtr<IUIShader> m_empty_default_shader;
 	CGammaControl		m_Gamma;
 };

@@ -345,7 +345,7 @@ const ui_shader& ui_core::GetVectorShader(const std::string_view& subpath, float
 	R_ASSERT(DevicePtr->m_pRender && "Resource manager");
 
 	if (DevicePtr == nullptr || DevicePtr->m_pRender == nullptr)
-		return ui_shader();
+		return m_empty_default;
 
 	return DevicePtr->m_pRender->GetSVGShader(subpath, requested_width, requested_height);
 }

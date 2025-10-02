@@ -134,6 +134,7 @@ private:
 #endif
 	u32 m_atlas_index_generator;
 	FactoryPtr<IUIShader>* m_p_default_shader;
+	FactoryPtr<IUIShader> m_empty_default_shader;
 	ID3DDevice* m_p_device;
 	ID3DDeviceContext* m_p_device_context;
 	CTextureAtlas m_default_atlas;
@@ -394,7 +395,6 @@ public:
 
 private:
 	CSVGStorage* m_pStorageSVG;
-
 #ifdef USE_DX11
 	map_DS	m_ds;
 	map_HS	m_hs;

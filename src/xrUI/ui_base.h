@@ -29,7 +29,7 @@ class UI_API ui_core:
 	Fvector2		m_pp_scale_;
 	Fvector2		m_scale_;
 	Fvector2*		m_current_scale;
-
+	ui_shader m_empty_default;
 public:
 	xr_stack<Frect> m_Scissors;
 	

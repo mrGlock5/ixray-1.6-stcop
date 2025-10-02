@@ -1428,7 +1428,7 @@ const FactoryPtr<IUIShader>& CSVGStorage::get_default_shader()
 		return *(m_p_default_shader);
 	}
 
-	return FactoryPtr<IUIShader>();
+	return m_empty_default_shader;
 }
 
 Frect CSVGStorage::get_uv(const std::string_view& subpath, float requested_width, float requested_height)

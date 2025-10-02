@@ -563,7 +563,7 @@ const FactoryPtr<IUIShader>& dxRenderDeviceRender::GetSVGShader(const std::strin
 		}
 	}
 
-	return FactoryPtr<IUIShader>();
+	return m_empty_default_shader;
 }
 
 const FactoryPtr<IUIShader>& dxRenderDeviceRender::GetSVGShader(const char* pSubpath, float width, float height)
@@ -581,7 +581,7 @@ const FactoryPtr<IUIShader>& dxRenderDeviceRender::GetSVGDefaultShader()
 
 	}
 
-	return FactoryPtr<IUIShader>();
+	return m_empty_default_shader;
 }
 
 Frect dxRenderDeviceRender::GetSVGUV(const std::string_view& subpath, float requested_width, float requested_height)
